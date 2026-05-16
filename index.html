@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>メダリアMTG 統合ダッシュボード</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Hiragino Kaku Gothic ProN","Meiryo",system-ui,sans-serif;background:#f5f5f3;color:#333;line-height:1.5}
+.wrap{max-width:1200px;margin:0 auto;padding:12px 20px}
+.hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:8px}
+.hdr-t{font-size:19px;font-weight:700}.hdr-s{font-size:12px;color:#888;margin-top:3px}
+.hdr-m{font-size:11px;color:#aaa;text-align:right;line-height:1.7}
+.flt{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.flt label{font-size:12px;color:#888}
+.flt select{font-size:12px;padding:5px 10px;border:1px solid #ddd;border-radius:6px;background:#fff;max-width:260px}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.kpi{background:#fff;border-radius:10px;padding:12px;border:1px solid #eee}
+.kpi-l{font-size:11px;color:#888;margin-bottom:4px}.kpi-v{font-size:22px;font-weight:700}.kpi-u{font-size:11px;color:#888;margin-top:3px}
+.hero{background:#fff;border-radius:12px;padding:16px 20px;margin-bottom:16px;border:2px solid #378ADD}
+.hero-top{display:flex;align-items:center;gap:16px;margin-bottom:12px}
+.hero-g{position:relative;width:90px;height:90px;flex-shrink:0}
+.hero-g svg{width:90px;height:90px}
+.hero-gv{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.hero-gn{font-size:22px;font-weight:700}.hero-gu{font-size:10px;color:#888}
+.hero-b{flex:1}
+.hero-bt{font-size:13px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.hero-badge{font-size:10px;padding:2px 8px;border-radius:6px;background:#e3f2fd;color:#1565c0;font-weight:600}
+.hero-bd{font-size:12px;color:#888}
+.hero-periods{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.hp{border-radius:8px;padding:10px;text-align:center;border:1px solid #eee;background:#fafaf8}
+.hp.cur{border:2px solid #378ADD;background:#f0f7ff}
+.hp-label{font-size:10px;color:#888;margin-bottom:2px}.hp-val{font-size:20px;font-weight:700}.hp-sub{font-size:10px;color:#888;margin-top:2px}
+.tabs{display:flex;border-bottom:1px solid #ddd;margin-bottom:16px;flex-wrap:wrap}
+.tab{font-size:13px;padding:8px 16px;cursor:pointer;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;color:#999;background:none;white-space:nowrap}
+.tab.on{color:#333;border-bottom-color:#333;font-weight:600}
+.card{background:#fff;border:1px solid #eee;border-radius:10px;padding:16px 20px;margin-bottom:14px}
+.ct{font-size:12px;font-weight:600;color:#888;letter-spacing:1px;margin-bottom:12px}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{text-align:left;font-weight:600;font-size:11px;color:#888;padding:5px 8px;border-bottom:1px solid #eee;position:sticky;top:0;background:#fff}
+.tbl td{padding:6px 8px;border-bottom:1px solid #f4f4f2}.tbl tr:hover td{background:#fafaf8}
+.br{display:flex;align-items:center;gap:6px;margin-bottom:5px}.br-l{font-size:12px;min-width:130px}
+.br-bg{flex:1;height:8px;background:#eee;border-radius:4px;overflow:hidden}
+.br-f{height:100%;border-radius:4px;transition:width .5s}.br-n{font-size:11px;color:#888;min-width:50px;text-align:right}
+.badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600}
+.b-ok{background:#e8f5e9;color:#2e7d32}.b-ng{background:#fce4ec;color:#c62828}.b-w{background:#fff8e1;color:#f57f17}
+.b-rec{background:#e3f2fd;color:#1565c0}.b-old{background:#fce4ec;color:#c62828}
+.dg3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.dc{border-radius:8px;padding:12px;text-align:center}.dc .dv{font-size:28px;font-weight:700}.dc .dl{font-size:11px;color:#555;margin-bottom:4px}
+.sg4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.sbox{background:#f8f8f6;border-radius:6px;padding:8px 10px;text-align:center}.sbox .sl{font-size:10px;color:#888;margin-bottom:4px}.sbox .sv{font-size:14px;font-weight:600}
+.ldr{overflow-x:auto;margin-bottom:10px}.ldr table{border-collapse:collapse;width:100%;font-size:11px}
+.ldr th,.ldr td{padding:4px 8px;text-align:center;border:1px solid #eee}.ldr th{background:#f4f4f2;font-weight:600}
+.ldr .hl{background:#378ADD;color:#fff;font-weight:700;border-radius:3px}
+.lr{margin-top:10px;padding:10px;background:#f0f7ff;border-radius:8px;font-size:12px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.panel{display:none}.panel.on{display:block}
+.mtg-wk{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-bottom:14px}
+.mtg-card{background:#f8f8f6;border-radius:8px;padding:10px;border-left:4px solid #ddd}
+.mtg-card.rec{border-left-color:#378ADD}.mtg-card.old{border-left-color:#E24B4A}.mtg-card.none{border-left-color:#ddd}
+.mtg-wn{font-size:11px;color:#888}.mtg-who{font-size:13px;font-weight:600}.mtg-tp{font-size:10px;margin-top:2px}
+.delta{font-size:10px;margin-left:2px}.delta.up{color:#c62828}.delta.dn{color:#2e7d32}
+@media(max-width:600px){.kpi-row{grid-template-columns:repeat(2,1fr)}.dg3,.sg4{grid-template-columns:1fr}.g2{grid-template-columns:1fr}.hero-top{flex-direction:column}.hero-periods{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hdr"><div><div class="hdr-t">メダリアMTG 統合ダッシュボード</div><div class="hdr-s">NPS成果評価・指摘改善率・クロスラダー計算</div></div><div class="hdr-m" id="hdr-m">読込中...</div></div>
+<div class="flt">
+<label>グループ</label><select id="sg" onchange="onG()"><option value="all">すべてのグループ</option></select>
+<label>管轄MG</label><select id="sm" onchange="onM()"><option value="all">すべてのMG</option></select>
+<label>店舗</label><select id="ss" onchange="onS()"><option value="all">すべて（一覧表示）</option></select>
+</div>
+<div class="hero" id="hero"></div>
+<div class="kpi-row" id="kpis"></div>
+<div id="detail" style="display:none"></div>
+<div id="listv">
+<div class="tabs">
+<button class="tab on" onclick="swTab('ov')">グループ概況</button>
+<button class="tab" onclick="swTab('mg')">管轄概況</button>
+<button class="tab" onclick="swTab('np')">NPS得点一覧</button>
+<button class="tab" onclick="swTab('is')">指摘改善</button>
+<button class="tab" onclick="swTab('mt')">MTG実施状況</button>
+</div>
+<div class="panel on" id="p-ov"></div><div class="panel" id="p-mg"></div><div class="panel" id="p-np"></div><div class="panel" id="p-is"></div><div class="panel" id="p-mt"></div>
+</div></div>
+<script>
+const GR=["東京第1G","東京第2G","東京第3G","神奈川G","埼玉G","千葉G","東日本広域G","東海第1G","東海第2G","関西北陸G","中四国九州G"];
+const CF=["スタッフの身だしなみ","スタッフの言葉使い","スタッフの笑顔","応対の丁寧さ","説明のわかりやすさ","自分にあった提案","強引な提案販売","不明点確認","手続きのスムーズさ","接客時間の長さ","待ち時間の長さ","店舗の清潔さ","事前内容の引継","その他"];
+const CL=["#378ADD","#1D9E75","#D85A30","#7F77DD","#BA7517","#E24B4A","#0F6E56","#185FA5","#3B6D11","#A32D2D","#534AB7","#854F0B","#0C447C","#888"];
+const LS=[70,67.5,65,62.5,60,57.5,55,52.5,50,47.5,45],LR=[.30,.275,.25,.225,.20];
+const LP=[[200,190,180,170,160],[190,180,170,160,150],[180,170,160,60,50],[170,160,150,50,40],[160,150,140,40,30],[60,50,40,30,20],[50,40,30,20,10],[40,30,20,10,0],[30,20,10,0,0],[20,10,0,0,0],[10,0,0,0,0]];
+const PD=[{id:'P1',l:'第1期',r:'1日〜7日',mn:1,mx:7},{id:'P2',l:'第2期',r:'8日〜14日',mn:8,mx:14},{id:'P3',l:'第3期',r:'15日〜21日',mn:15,mx:21},{id:'P4',l:'第4期',r:'22日〜末日',mn:22,mx:31}];
+
+let NPS=[],ISS=[],IP=[],MGM=[],GRM=[],STM=[],NMG=[],NM={},ch={},fG='all',fM='all',fS='all',ND='';
+
+function cp(){const d=new Date().getDate();return PD.findIndex(p=>d>=p.mn&&d<=p.mx);}
+
+async function init(){
+  try{
+    const [r1,r2,r3,r4,r5,r6,r7,r8]=await Promise.all([
+      fetch('./data/nps_store.json'),fetch('./data/issues.json'),fetch('./data/mg_mtg.json'),fetch('./data/grp_mtg.json'),
+      fetch('./data/store_mtg.json'),fetch('./data/name_map.json'),fetch('./data/nps_mg.json'),fetch('./data/issues_prev.json')
+    ]);
+    NPS=await r1.json();ISS=await r2.json();MGM=await r3.json();GRM=await r4.json();
+    STM=await r5.json();NM=await r6.json();NMG=await r7.json();IP=await r8.json();
+    NPS.forEach(s=>{if(NM[s.n])s.n=NM[s.n];});
+    NMG.forEach(s=>{if(NM[s.n])s.n=NM[s.n];});
+    ND='11';
+    document.getElementById('hdr-m').innerHTML='NPS: '+NPS.length+'店舗（'+ND+'日時点）<br>指摘改善: '+ISS.length+'店舗（毎朝更新）<br>MTG: '+STM.length+'店舗';
+    setupFilters();bH();bK();buildOv();
+  }catch(e){document.getElementById('hdr-m').textContent='エラー: '+e.message;console.error(e);}
+}
+
+function setupFilters(){const sg=document.getElementById('sg');GR.forEach(g=>{const o=document.createElement('option');o.value=g;o.textContent=g;sg.appendChild(o);});rMG();rST();}
+function rMG(){const sm=document.getElementById('sm');sm.innerHTML='<option value="all">すべてのMG</option>';const ms=new Set();STM.forEach(s=>{if(s.mg&&(fG==='all'||s.g===fG))ms.add(s.mg);});[...ms].sort((a,b)=>a.localeCompare(b,'ja')).forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m+'MG';sm.appendChild(o);});}
+function rST(){const ss=document.getElementById('ss');ss.innerHTML='<option value="all">すべて（一覧表示）</option>';const nm=new Map();NPS.forEach(s=>{if((fG==='all'||s.g===fG)&&(fM==='all'||gMG(s.n)===fM)){if(!nm.has(s.n))nm.set(s.n,{n:true,i:false});}});ISS.forEach(s=>{if(fG==='all'||s.g===fG){if(nm.has(s.n))nm.get(s.n).i=true;else if(fM==='all'||gMG(s.n)===fM)nm.set(s.n,{n:false,i:true});}});[...nm.entries()].sort((a,b)=>a[0].localeCompare(b[0],'ja')).forEach(([n,d])=>{const o=document.createElement('option');o.value=n;const t=[];if(d.n)t.push('NPS');if(d.i)t.push('指摘');o.textContent=n+'（'+t.join('・')+'）';ss.appendChild(o);});}
+function gMG(n){const s=STM.find(x=>x.n===n);return s?s.mg:'';}
+function onG(){fG=document.getElementById('sg').value;fM='all';fS='all';rMG();rST();bH();bK();const a=document.querySelector('.panel.on');if(a)swTab(a.id.replace('p-',''));document.getElementById('detail').style.display='none';document.getElementById('listv').style.display='';}
+function onM(){fM=document.getElementById('sm').value;fS='all';rST();bH();bK();const a=document.querySelector('.panel.on');if(a)swTab(a.id.replace('p-',''));document.getElementById('detail').style.display='none';document.getElementById('listv').style.display='';}
+function onS(){fS=document.getElementById('ss').value;if(fS==='all'){document.getElementById('detail').style.display='none';document.getElementById('listv').style.display='';bK();}else{document.getElementById('detail').style.display='';document.getElementById('listv').style.display='none';bD();}}
+
+function fNPS(){return NPS.filter(s=>(fG==='all'||s.g===fG)&&(fM==='all'||gMG(s.n)===fM));}
+function fISS(){return ISS.filter(s=>fG==='all'||s.g===fG);}
+function fIP(){return IP.filter(s=>fG==='all'||s.g===fG);}
+function fSTM(){let r=fG==='all'?STM:STM.filter(s=>s.g===fG);if(fM!=='all')r=r.filter(s=>s.mg===fM);return r;}
+
+// Period rates
+function pRates(){
+  const sts=fSTM();const tot=sts.length||1;
+  return PD.map(p=>{let rc=0,ol=0;sts.forEach(s=>{s.wk.forEach(w=>{if(!w.d)return;const dy=parseInt(w.d.split('-')[2]);if(dy>=p.mn&&dy<=p.mx){if(w.tp==='現行版')rc++;else ol++;}});});return{...p,rc,ol,tt:rc+ol,rate:rc+ol>0?Math.round(rc/(rc+ol)*100):0,impl:Math.round((rc+ol)/tot*100)};});
+}
+
+function bH(){
+  const pr=pRates();const ci=cp();const cu=pr[ci]||pr[0];const co=cu.rate>=80?'#1D9E75':cu.rate>=50?'#378ADD':'#E24B4A';const cc=226.2;
+  let ps='';pr.forEach((p,i)=>{const ic=i===ci;const c=p.rate>=80?'#1D9E75':p.rate>=50?'#378ADD':'#E24B4A';ps+='<div class="hp'+(ic?' cur':'')+'"><div class="hp-label">'+p.l+'（'+p.r+'）</div><div class="hp-val" style="color:'+c+'">'+p.rate+'%</div><div class="hp-sub">実施'+p.tt+'回（現行'+p.rc+'/旧'+p.ol+'）</div></div>';});
+  document.getElementById('hero').innerHTML='<div class="hero-top"><div class="hero-g"><svg viewBox="0 0 90 90"><circle cx="45" cy="45" r="36" fill="none" stroke="#eee" stroke-width="8"/><circle cx="45" cy="45" r="36" fill="none" stroke="'+co+'" stroke-width="8" stroke-linecap="round" stroke-dasharray="'+cc+'" stroke-dashoffset="'+cc*(1-cu.rate/100)+'" transform="rotate(-90 45 45)"/></svg><div class="hero-gv"><span class="hero-gn">'+cu.rate+'</span><span class="hero-gu">%</span></div></div><div class="hero-b"><div class="hero-bt">アクションレコメンド利用率 <span class="hero-badge">'+cu.l+'（'+cu.r+'）</span></div><div class="hero-bd">目標: <strong>100%</strong>　現在期間の現行版利用率</div></div></div><div class="hero-periods">'+ps+'</div>';
+}
+
+function bK(){
+  const ns=fNPS();const is=fISS();const ip=fIP();
+  const ap=ns.length?Math.round(ns.reduce((a,s)=>a+(s.pt||0),0)/ns.length):0;
+  const asc=ns.length?Math.round(ns.reduce((a,s)=>a+(s.sc||0),0)/ns.length*10)/10:0;
+  const ar=ns.length?Math.round(ns.reduce((a,s)=>a+(s.rr||0),0)/ns.length*1000)/10:0;
+  const ti=is.reduce((a,s)=>a+s.iss,0),tr=is.reduce((a,s)=>a+s.resp,0),ir=tr>0?Math.round(ti/tr*1000)/10:0;
+  const tip=ip.reduce((a,s)=>a+s.iss,0),trp=ip.reduce((a,s)=>a+s.resp,0),irp=trp>0?Math.round(tip/trp*1000)/10:0;
+  const df=Math.round((ir-irp)*10)/10;const dh=df>0?'<span class="delta up">▲'+df+'</span>':df<0?'<span class="delta dn">▼'+Math.abs(df)+'</span>':'<span class="delta">→</span>';
+  document.getElementById('kpis').innerHTML=kH('NPS得点（平均）',ap,ND+'日時点')+kH('NPSスコア（平均）',asc,'SY合算')+kH('回答率（平均）',ar+'%','SY合算')+'<div class="kpi"><div class="kpi-l">指摘改善率（当月）</div><div class="kpi-v">'+ir+'%</div><div class="kpi-u">'+ti+'件/'+tr+'回答 '+dh+'</div></div>';
+}
+function kH(l,v,u){return '<div class="kpi"><div class="kpi-l">'+l+'</div><div class="kpi-v">'+v+'</div><div class="kpi-u">'+u+'</div></div>';}
+
+function swTab(id){document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('on',['ov','mg','np','is','mt'][i]===id));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));document.getElementById('p-'+id).classList.add('on');({ov:buildOv,mg:buildMg,np:buildNp,is:buildIs,mt:buildMt})[id]();}
+
+function buildOv(){
+  const gd=GR.map(g=>{const ns=NPS.filter(s=>s.g===g),is=ISS.filter(s=>s.g===g);return{g,n:ns.length,pt:ns.length?Math.round(ns.reduce((a,s)=>a+(s.pt||0),0)/ns.length):0,sc:ns.length?Math.round(ns.reduce((a,s)=>a+(s.sc||0),0)/ns.length*10)/10:0,ir:(()=>{const t=is.reduce((a,s)=>a+s.iss,0),r=is.reduce((a,s)=>a+s.resp,0);return r>0?Math.round(t/r*1000)/10:0;})()};});
+  let h='<div class="card"><div class="ct">グループ別 NPS得点</div><div style="position:relative;height:220px"><canvas id="c1"></canvas></div></div>';
+  h+='<div class="g2"><div class="card"><div class="ct">グループ別 スコア</div><div style="position:relative;height:180px"><canvas id="c2"></canvas></div></div><div class="card"><div class="ct">グループ別 指摘改善率</div><div style="position:relative;height:180px"><canvas id="c3"></canvas></div></div></div>';
+  h+='<div class="card"><div class="ct">グループ別サマリ</div><table class="tbl"><thead><tr><th>グループ</th><th>店舗数</th><th>NPS得点</th><th>スコア</th><th>指摘改善率</th></tr></thead><tbody>';
+  gd.forEach(d=>{h+='<tr><td>'+d.g+'</td><td style="text-align:right">'+d.n+'</td><td style="text-align:right;font-weight:700">'+d.pt+'</td><td style="text-align:right">'+d.sc+'</td><td style="text-align:right">'+d.ir+'%</td></tr>';});
+  h+='</tbody></table></div>';document.getElementById('p-ov').innerHTML=h;
+  dC('c1');ch.c1=new Chart(document.getElementById('c1'),{type:'bar',data:{labels:gd.map(d=>d.g.replace('G','')),datasets:[{data:gd.map(d=>d.pt),backgroundColor:'#378ADD',borderRadius:3,borderSkipped:false}]},options:bo({})});
+  dC('c2');ch.c2=new Chart(document.getElementById('c2'),{type:'bar',data:{labels:gd.map(d=>d.g.replace('G','')),datasets:[{data:gd.map(d=>d.sc),backgroundColor:'#1D9E75',borderRadius:3,borderSkipped:false}]},options:bo({max:100})});
+  dC('c3');ch.c3=new Chart(document.getElementById('c3'),{type:'bar',data:{labels:gd.map(d=>d.g.replace('G','')),datasets:[{data:gd.map(d=>d.ir),backgroundColor:gd.map(d=>d.ir>30?'#E24B4A':d.ir>25?'#EF9F27':'#1D9E75'),borderRadius:3,borderSkipped:false}]},options:bo({sfx:'%'})});
+}
+
+function buildMg(){
+  let ms=fG==='all'?MGM:MGM.filter(m=>STM.some(s=>s.mg===m.m&&(fG==='all'||s.g===fG)));
+  if(fM!=='all')ms=ms.filter(m=>m.m===fM);
+  const sr=[...ms].sort((a,b)=>b.rate-a.rate);
+  let h='<div class="card"><div class="ct">管轄MG別 アクションレコメンド利用率</div><div style="position:relative;height:'+Math.max(200,sr.length*24)+'px"><canvas id="c4"></canvas></div></div>';
+  h+='<div class="card"><div class="ct">管轄MG別サマリ</div><div style="max-height:500px;overflow-y:auto"><table class="tbl"><thead><tr><th>管轄MG</th><th>店舗数</th><th>月間利用率</th><th>現行版</th><th>旧版</th><th>W1</th><th>W2</th><th>W3</th><th>W4</th></tr></thead><tbody>';
+  sr.forEach(m=>{const c=m.rate>=60?'#1D9E75':m.rate>=40?'#BA7517':'#c62828';const rt=m.rec.reduce((a,v)=>a+v,0),ot=m.old.reduce((a,v)=>a+v,0);h+='<tr><td style="font-weight:600">'+m.m+'MG</td><td style="text-align:right">'+m.t+'</td><td style="text-align:right;font-weight:700;color:'+c+'">'+m.rate+'%</td><td style="text-align:right"><span class="badge b-rec">'+rt+'</span></td><td style="text-align:right">'+(ot>0?'<span class="badge b-ng">'+ot+'</span>':'0')+'</td>';m.rec.forEach((v,i)=>{h+='<td style="text-align:center;font-size:11px">'+v+'/'+(v+m.old[i])+'</td>';});h+='</tr>';});
+  h+='</tbody></table></div></div>';document.getElementById('p-mg').innerHTML=h;
+  dC('c4');const s2=[...ms].sort((a,b)=>a.rate-b.rate);ch.c4=new Chart(document.getElementById('c4'),{type:'bar',data:{labels:s2.map(m=>m.m+'MG'),datasets:[{data:s2.map(m=>m.rate),backgroundColor:s2.map(m=>m.rate>=60?'#1D9E75':m.rate>=40?'#BA7517':'#E24B4A'),borderRadius:3,borderSkipped:false}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>v+'%'},max:100},y:{grid:{display:false},ticks:{font:{size:11}}}}}});
+}
+
+function buildNp(){
+  const d=fNPS().slice().sort((a,b)=>(b.pt||0)-(a.pt||0));
+  let h='<div class="card"><div class="ct">NPS得点ランキング（'+d.length+'店舗・'+ND+'日時点）</div><div style="max-height:500px;overflow-y:auto"><table class="tbl"><thead><tr>';
+  ['#','グループ','店舗名','得点','スコア','回答率','高得点誘導','ログイン','FB','MTG'].forEach(c=>{h+='<th>'+c+'</th>';});h+='</tr></thead><tbody>';
+  d.forEach((s,i)=>{const pc=s.pt>=150?'#1D9E75':s.pt>=50?'#BA7517':'#c62828';h+='<tr><td style="text-align:center;color:#888">'+(i+1)+'</td><td style="font-size:11px">'+s.g+'</td><td>'+s.n+'</td><td style="font-weight:700;color:'+pc+';text-align:right">'+s.pt+'</td><td style="text-align:right">'+s.sc+'</td><td style="text-align:right">'+(s.rr?Math.round(s.rr*1000)/10+'%':'-')+'</td><td style="text-align:right;color:'+(s.hr>=.05?'#c62828':'#1D9E75')+'">'+(s.hr!=null?Math.round(s.hr*1000)/10+'%':'-')+'</td><td style="text-align:center">'+(s.li>=1?'✓':Math.round((s.li||0)*100)+'%')+'</td><td style="text-align:center">'+(s.fb>=1?'✓':Math.round((s.fb||0)*100)+'%')+'</td><td style="text-align:center">'+(s.mt>=1?'✓':Math.round((s.mt||0)*100)+'%')+'</td></tr>';});
+  h+='</tbody></table></div></div>';document.getElementById('p-np').innerHTML=h;
+}
+
+function buildIs(){
+  const ds=fISS();const dp=fIP();const ct=CF.map((_,i)=>ds.reduce((a,s)=>a+(s.c[i]||0),0));const ctp=CF.map((_,i)=>dp.reduce((a,s)=>a+(s.c[i]||0),0));const mx=Math.max(...ct,1);
+  let h='<div class="card"><div class="ct">指摘改善カテゴリ別件数（当月 vs 前月）</div>';
+  CF.forEach((c,i)=>{const df=ct[i]-ctp[i];const dh=df>0?'<span class="delta up">+'+df+'</span>':df<0?'<span class="delta dn">'+df+'</span>':'';h+='<div class="br"><span class="br-l">'+c+'</span><div class="br-bg"><div class="br-f" style="width:'+Math.round(ct[i]/mx*100)+'%;background:'+CL[i]+'"></div></div><span class="br-n">'+ct[i]+' '+dh+'</span></div>';});
+  h+='</div><div class="card"><div class="ct">グループ別 指摘改善率（当月）</div><div style="position:relative;height:200px"><canvas id="c5"></canvas></div></div>';
+  document.getElementById('p-is').innerHTML=h;
+  const gd=GR.map(g=>{const is=ISS.filter(s=>s.g===g);const ti=is.reduce((a,s)=>a+s.iss,0),tr=is.reduce((a,s)=>a+s.resp,0);return{g:g.replace('G',''),ir:tr>0?Math.round(ti/tr*1000)/10:0};});
+  dC('c5');ch.c5=new Chart(document.getElementById('c5'),{type:'bar',data:{labels:gd.map(d=>d.g),datasets:[{data:gd.map(d=>d.ir),backgroundColor:gd.map(d=>d.ir>30?'#E24B4A':d.ir>25?'#EF9F27':'#1D9E75'),borderRadius:3,borderSkipped:false}]},options:bo({sfx:'%'})});
+}
+
+function buildMt(){
+  const sts=fSTM();
+  let h='<div class="card"><div class="ct">店舗別 MTG実施状況（実施者・版）</div><div style="max-height:600px;overflow-y:auto"><table class="tbl"><thead><tr><th>グループ</th><th>管轄MG</th><th>店舗名</th><th>現行版</th><th>旧版</th>';
+  for(let w=1;w<=5;w++)h+='<th>'+w+'回目</th>';h+='</tr></thead><tbody>';
+  sts.forEach(s=>{h+='<tr><td style="font-size:11px">'+s.g+'</td><td style="font-size:11px">'+s.mg+'MG</td><td>'+s.n+'</td><td style="font-size:11px">'+s.rec+'</td><td style="font-size:11px">'+s.old+'</td>';
+    for(let w=1;w<=5;w++){const wk=s.wk.find(x=>x.w===w);if(wk){const ir=wk.tp==='現行版';h+='<td style="font-size:10px"><span class="badge '+(ir?'b-rec':'b-ng')+'">'+wk.tp+'</span><br>'+wk.who+'<br><span style="color:#aaa">'+wk.d+'</span></td>';}else h+='<td style="text-align:center;color:#ddd">—</td>';}h+='</tr>';});
+  h+='</tbody></table></div></div>';document.getElementById('p-mt').innerHTML=h;
+}
+
+function bD(){
+  const nps=NPS.find(s=>s.n===fS);const iss=ISS.find(s=>s.n===fS);const mtg=STM.find(s=>s.n===fS);const isp=IP.find(s=>s.n===fS);
+  if(!nps&&!iss&&!mtg){document.getElementById('detail').innerHTML='<div class="card"><p style="color:#888">「'+fS+'」のデータが見つかりません</p></div>';return;}
+  let h='';
+  if(mtg){h+='<div class="card"><div class="ct">MTG実施状況 ─ '+fS+'（'+mtg.mg+'MG管轄）</div><div style="display:flex;gap:12px;margin-bottom:12px"><span>現行版: <strong>'+mtg.rec+'</strong></span><span>旧版: <strong>'+mtg.old+'</strong></span></div><div class="mtg-wk">';
+    for(let w=1;w<=5;w++){const wk=mtg.wk.find(x=>x.w===w);if(wk){const ir=wk.tp==='現行版';h+='<div class="mtg-card '+(ir?'rec':'old')+'"><div class="mtg-wn">'+w+'回目（'+wk.d+'）</div><div class="mtg-who">'+wk.who+'</div><div class="mtg-tp"><span class="badge '+(ir?'b-rec':'b-ng')+'">'+wk.tp+'</span></div></div>';}else h+='<div class="mtg-card none"><div class="mtg-wn">'+w+'回目</div><div class="mtg-who" style="color:#ccc">未実施</div></div>';}h+='</div></div>';}
+  if(nps){
+    const rr=Math.round(nps.rr*1000)/10,hr=nps.hr!=null?Math.round(nps.hr*1000)/10:0;
+    let lri=LS.findIndex(s=>nps.sc>=s);if(lri===-1)lri=LS.length-1;let lci=LR.findIndex(r=>nps.rr>=r);if(lci===-1)lci=LR.length-1;
+    const bp=LP[lri]?.[lci]??0;const hm=nps.hr<.05?1:nps.hr<.06?.8:nps.hr<.07?.7:nps.hr<.08?.6:nps.hr<.09?.5:nps.hr<.10?.4:.3;const fp=Math.round(bp*hm);
+    h+='<div class="card"><div class="ct">NPS成果評価 ─ '+fS+'（'+ND+'日時点）</div><div class="dg3"><div class="dc" style="background:#f0f7ff"><div class="dl">NPS得点</div><div class="dv" style="color:#378ADD">'+nps.pt+'</div></div><div class="dc" style="background:#f0faf4"><div class="dl">スコア</div><div class="dv" style="color:#1D9E75">'+nps.sc+'</div></div><div class="dc" style="background:#fef7ee"><div class="dl">回答率</div><div class="dv" style="color:#BA7517">'+rr+'%</div></div></div>';
+    h+='<div class="sg4">';[['店長ログイン率',nps.li>=1?'100%':Math.round((nps.li||0)*100)+'%',nps.li>=.8?'ok':'w'],['FBコール率',nps.fb>=1?'100%':Math.round((nps.fb||0)*100)+'%',nps.fb>=.8?'ok':'w'],['MTG実施率',nps.mt>=1?'100%':Math.round((nps.mt||0)*100)+'%',nps.mt>=1?'ok':'ng'],['高得点誘導率',hr+'%',nps.hr<.05?'ok':nps.hr<.08?'w':'ng']].forEach(([l,v,t])=>{h+='<div class="sbox"><div class="sl">'+l+'</div><div class="sv">'+v+'</div><div style="margin-top:4px"><span class="badge b-'+t+'">'+(t==='ok'?'達成':t==='w'?'注意':'未達')+'</span></div></div>';});h+='</div>';
+    h+='<div style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px">クロスラダー</div><div class="ldr"><table><thead><tr><th>スコア＼回答率</th>';LR.forEach((r,ci)=>{h+='<th'+(ci===lci?' class="hl"':'')+'>'+Math.round(r*1000)/10+'%</th>';});h+='</tr></thead><tbody>';LS.forEach((sc,ri)=>{h+='<tr><td'+(ri===lri?' class="hl"':'')+'>'+sc+'</td>';LP[ri].forEach((pt,ci)=>{h+='<td'+(ri===lri&&ci===lci?' class="hl"':'')+'>'+pt+'</td>';});h+='</tr>';});h+='</tbody></table></div>';
+    h+='<div class="lr"><strong>自動計算:</strong> スコア'+nps.sc+' → '+LS[lri]+'以上 / 回答率'+rr+'% → '+Math.round(LR[lci]*100)+'%以上 → 基礎点<strong>'+bp+'pt</strong>';
+    if(nps.hr>=.05)h+=' <span style="color:#c62828">× 高得点誘導'+hr+'% → ×'+hm+' → <strong>'+fp+'pt</strong></span>';else h+=' <span style="color:#1D9E75">（減算なし）→ <strong>'+fp+'pt</strong></span>';h+='</div></div>';}
+  if(iss){const ir=iss.resp>0?Math.round(iss.iss/iss.resp*1000)/10:0;const mx=Math.max(...iss.c,1);const irp=isp&&isp.resp>0?Math.round(isp.iss/isp.resp*1000)/10:null;const df=irp!=null?Math.round((ir-irp)*10)/10:null;const dh=df!=null?(df>0?'<span class="delta up">▲'+df+'</span>':df<0?'<span class="delta dn">▼'+Math.abs(df)+'</span>':'<span class="delta">→</span>'):'';
+    h+='<div class="card"><div class="ct">指摘改善サマリ ─ '+fS+'（当月）</div><div style="display:flex;gap:16px;margin-bottom:14px"><div><span style="font-size:11px;color:#888">総回答数</span><div style="font-size:20px;font-weight:600">'+iss.resp+'</div></div><div><span style="font-size:11px;color:#888">指摘件数（当月）</span><div style="font-size:20px;font-weight:600;color:#c62828">'+iss.iss+'</div></div><div><span style="font-size:11px;color:#888">指摘改善率</span><div style="font-size:20px;font-weight:600">'+ir+'% '+dh+'</div></div>';
+    if(isp)h+='<div><span style="font-size:11px;color:#888">前月</span><div style="font-size:20px;font-weight:600;color:#888">'+irp+'%</div></div>';h+='</div>';
+    CF.forEach((c,i)=>{const v=iss.c[i]||0;const pv=isp?isp.c[i]||0:0;const d=v-pv;const dd=d>0?'<span class="delta up">+'+d+'</span>':d<0?'<span class="delta dn">'+d+'</span>':'';h+='<div class="br"><span class="br-l">'+c+'</span><div class="br-bg"><div class="br-f" style="width:'+Math.round(v/mx*100)+'%;background:'+CL[i]+'"></div></div><span class="br-n">'+v+' '+dd+'</span></div>';});
+    const ti=iss.c.indexOf(Math.max(...iss.c));if(iss.c[ti]>0)h+='<div style="margin-top:10px;padding:10px;background:#fef7ee;border-radius:8px;font-size:12px"><strong>最重要改善項目:</strong> '+CF[ti]+'（'+iss.c[ti]+'件）</div>';h+='</div>';}
+  document.getElementById('detail').innerHTML=h;
+}
+
+function dC(id){if(ch[id]){ch[id].destroy();delete ch[id];}}
+function bo(o){return{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{max:o.max,ticks:{font:{size:10},callback:v=>o.sfx?v+o.sfx:v}}}};}
+init();
+</script>
+</body>
+</html>
