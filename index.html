@@ -64,6 +64,94 @@ body{font-family:"Hiragino Kaku Gothic ProN","Meiryo",system-ui,sans-serif;backg
 .delta{font-size:10px;margin-left:2px;font-weight:600}.delta.up{color:#c62828}.delta.dn{color:#2e7d32}
 .info-box{background:#fff3e0;border:1px solid #ffe0b2;border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:14px;color:#e65100}
 @media(max-width:600px){.kpi-row{grid-template-columns:repeat(2,1fr)}.dg3,.sg4{grid-template-columns:1fr}.g2{grid-template-columns:1fr}.hero-top{flex-direction:column}.hero-periods{grid-template-columns:repeat(2,1fr)}}
+
+/* =========================================
+   ここから：スタイリッシュ化のための追加スタイル
+   ========================================= */
+
+/* 1. 全体の背景を少しクリアな色にし、文字色を柔らかく */
+body {
+  background: #f8fafc;
+  color: #334155;
+}
+
+/* 2. カード類を「線で区切る」から「影で浮かせる」モダンな立体感へ */
+.card, .hero, .kpi, .hp, .flt {
+  border: none !important;
+  box-shadow: 0 4px 20px rgba(148, 163, 184, 0.15) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* カードにマウスを乗せた時に少し浮き上がるインタラクション */
+.card:hover, .kpi:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(148, 163, 184, 0.2) !important;
+}
+
+/* 3. 見出しや数字をスッキリさせる */
+.ct {
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 12px;
+  font-size: 15px;
+  color: #0f172a;
+}
+.kpi-v, .hp-val, .hero-gn, .dv {
+  font-family: 'Helvetica Neue', Arial, sans-serif; /* 数字を美しく */
+  letter-spacing: -0.5px;
+}
+
+/* 4. タブデザインを今風の「アンダーライン」スタイルに */
+.tabs {
+  background: transparent;
+  box-shadow: none;
+  border-bottom: 2px solid #e2e8f0;
+  border-radius: 0;
+  padding: 0;
+  gap: 24px;
+}
+.tab {
+  background: transparent;
+  color: #64748b;
+  border-radius: 0;
+  padding: 12px 4px;
+  position: relative;
+  font-size: 14px;
+}
+.tab:hover:not(.on) {
+  background: transparent;
+  color: #0f172a;
+}
+.tab.on {
+  background: transparent;
+  color: #283593;
+}
+.tab.on::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: #283593;
+  border-radius: 3px 3px 0 0;
+}
+
+/* 5. 進捗バー（指摘改善など）を少し太くして視認性アップ */
+.br-bg {
+  height: 14px;
+  background: #f1f5f9;
+}
+.br-l {
+  font-size: 13px;
+}
+
+/* 6. テーブルのヘッダーをスタイリッシュに */
+.tbl th {
+  background: #f8fafc !important;
+  color: #475569 !important;
+  border-bottom: 2px solid #e2e8f0;
+  padding: 12px 10px;
+}
 </style>
 </head>
 <body>
