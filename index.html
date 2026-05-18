@@ -337,7 +337,7 @@ function buildNp(){
 function buildIs(){
   const ds=fISS();const ct=CF.map((_,i)=>ds.reduce((a,s)=>a+(s.c[i]||0),0));const mx=Math.max(...ct,1);
   let h='<div class="card"><div class="ct">指摘改善カテゴリ別件数（当月）</div>';
-  [...Array(CF.length).keys()].sort((a,b)=>ct[b]-ct[a]).forEach(i=>{const c=CF[i];h+='<div class="br"><span class="br-l">'+c+'</span><div class="br-bg"><div class="br-f" style="width:'+Math.round(ct[i]/mx*100)+'%;background:'+CL[i]+'"</div></div><span class="br-n">'+ct[i]+'件</span></div>';});
+  [...Array(CF.length).keys()].sort((a,b)=>ct[b]-ct[a]).forEach(i=>{const c=CF[i];h+='<div class="br"><span class="br-l">'+c+'</span><div class="br-bg"><div class="br-f" style="width:'+Math.round(ct[i]/mx*100)+'%;background:'+CL[i]+'"></div></div><span class="br-n">'+ct[i]+'件</span></div>';});
   h+='</div>';
   // Group comparison: good/bad vs prev month
   const gd=GR.map(g=>{const is=ISS.filter(s=>s.g===g),ip=IP.filter(s=>s.g===g);
