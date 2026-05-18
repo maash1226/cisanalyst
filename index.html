@@ -104,10 +104,10 @@ body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text
 .tbl tr:hover td{background:rgba(255,255,255,.02)}
 
 /* ── Bars ── */
-.br{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.br{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .br-l{font-size:12px;min-width:130px;color:var(--text2)}
-.br-bg{flex:1;height:6px;background:#2a2a2a;border-radius:3px;overflow:hidden}
-.br-f{height:100%;border-radius:3px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.br-bg{flex:1;height:10px;background:#eef2f7;border-radius:5px;overflow:hidden}
+.br-f{height:100%;border-radius:5px;transition:width .6s cubic-bezier(.4,0,.2,1)}
 .br-n{font-size:11px;color:var(--text2);min-width:44px;text-align:right;font-family:"DM Mono",monospace}
 
 /* ── Score box ── */
@@ -170,10 +170,7 @@ body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text
   .dg3,.sg4{grid-template-columns:1fr}
 }
 </style>
-</head>
 <body>
-
-<!-- Header -->
 <header class="hdr">
   <div class="hdr-left">
     <span class="hdr-logo">CISダッシュボード</span>
@@ -181,10 +178,7 @@ body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text
   </div>
   <div class="hdr-right" id="hdr-m">読込中...</div>
 </header>
-
 <div class="layout">
-
-<!-- Side Nav -->
 <nav class="nav">
   <div class="nav-section">メイン</div>
   <div class="nav-item on" onclick="swTab('ov')" id="ni-ov"><span class="nav-icon">▦</span>グループ概況</div>
@@ -194,11 +188,7 @@ body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text
   <div class="nav-item" onclick="swTab('is')" id="ni-is"><span class="nav-icon">◐</span>指摘改善</div>
   <div class="nav-item" onclick="swTab('mt')" id="ni-mt"><span class="nav-icon">▷</span>MTG実施状況</div>
 </nav>
-
-<!-- Main -->
 <main class="main">
-
-  <!-- Filters -->
   <div class="flt-bar">
     <label>GROUP</label>
     <select id="sg" onchange="onG()"><option value="all">すべてのグループ</option></select>
@@ -207,17 +197,9 @@ body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text
     <label>STORE</label>
     <select id="ss" onchange="onS()"><option value="all">すべて（一覧表示）</option></select>
   </div>
-
-  <!-- Hero -->
   <div class="hero" id="hero"></div>
-
-  <!-- KPIs -->
   <div class="kpi-row" id="kpis"></div>
-
-  <!-- Store Detail -->
   <div id="detail" style="display:none"></div>
-
-  <!-- List View -->
   <div id="listv">
     <div class="panel on" id="p-ov"></div>
     <div class="panel" id="p-mg"></div>
@@ -225,19 +207,16 @@ body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text
     <div class="panel" id="p-is"></div>
     <div class="panel" id="p-mt"></div>
   </div>
-
 </main>
 </div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-
 Chart.defaults.color='#5f6368';
 Chart.defaults.borderColor='#e8eaed';
-Chart.defaults.backgroundColor='rgba(0,0,0,.03)';
 
 const GR=["東京第1G","東京第2G","東京第3G","神奈川G","埼玉G","千葉G","東日本広域G","東海第1G","東海第2G","関西北陸G","中四国九州G"];
 const CF=["スタッフの身だしなみ","スタッフの言葉使い","スタッフの笑顔","応対の丁寧さ","説明のわかりやすさ","自分にあった提案","強引な提案販売","不明点確認","手続きのスムーズさ","接客時間の長さ","待ち時間の長さ","店舗の清潔さ","事前内容の引継","その他"];
-const CL=["#1e90e9","#00c875","#e91e8c","#a855f7","#f59e0b","#e91e1e","#10b981","#3b82f6","#84cc16","#ef4444","#8b5cf6","#d97706","#06b6d4","#9ca3af"];
+const CL=["#1565c0","#2e7d32","#d84315","#6a1b9a","#f57f17","#c62828","#00695c","#0d47a1","#33691e","#b71c1c","#4527a0","#795548","#01579b","#757575"];
 const LS=[70,67.5,65,62.5,60,57.5,55,52.5,50,47.5,45],LR=[.30,.275,.25,.225,.20];
 const LP=[[200,190,180,170,160],[190,180,170,160,150],[180,170,160,60,50],[170,160,150,50,40],[160,150,140,40,30],[60,50,40,30,20],[50,40,30,20,10],[40,30,20,10,0],[30,20,10,0,0],[20,10,0,0,0],[10,0,0,0,0]];
 const PD=[{l:'第1期',r:'1日〜7日',mn:1,mx:7},{l:'第2期',r:'8日〜14日',mn:8,mx:14},{l:'第3期',r:'15日〜21日',mn:15,mx:21},{l:'第4期',r:'22日〜末日',mn:22,mx:31}];
@@ -291,11 +270,11 @@ function bH(){
   pr.forEach((p,i)=>{if(i<ci){totalRec+=p.rc;totalOld+=p.ol;}});
   const totalRate=totalRec+totalOld>0?Math.round(totalRec/(totalRec+totalOld)*100):0;
   const displayRate=ci>0?totalRate:(pr[0].rate);
-  const col=displayRate>=80?'#0a8754':displayRate>=50?'#1565c0':'#e91e8c';
+  const col=displayRate>=80?'#2e7d32':displayRate>=50?'#1565c0':'#c62828';
   const circ=226.2;
   const periodLabel=ci>0?'〜第'+ci+'期累計':'第1期';
   let periods='';
-  pr.forEach((p,i)=>{const ic=i===ci;const c=p.rate>=80?'#0a8754':p.rate>=50?'#1565c0':'#e91e8c';const isCompleted=i<ci;
+  pr.forEach((p,i)=>{const ic=i===ci;const c=p.rate>=80?'#2e7d32':p.rate>=50?'#1565c0':'#c62828';const isCompleted=i<ci;
     periods+='<div class="hp'+(ic?' cur':'')+'"><div class="hp-label">'+p.l+'（'+p.r+'）'+(isCompleted?' ✓':'')+'</div><div class="hp-val" style="color:'+(p.tt>0?c:'#ccc')+'">'+p.rate+'%</div><div class="hp-sub">実施'+p.tt+'回（現行'+p.rc+'/旧'+p.ol+'）</div></div>';});
   const title=isStore?fS+'のアクションレコメンド利用率':'アクションレコメンド利用率';
   document.getElementById('hero').innerHTML='<div class="hero-top"><div class="hero-g"><svg viewBox="0 0 90 90"><circle cx="45" cy="45" r="36" fill="none" stroke="#e0e0e0" stroke-width="8"/><circle cx="45" cy="45" r="36" fill="none" stroke="'+col+'" stroke-width="8" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+circ*(1-displayRate/100)+'" transform="rotate(-90 45 45)"/></svg><div class="hero-gv"><span class="hero-gn" style="color:'+col+'">'+displayRate+'</span><span class="hero-gu">%</span></div></div><div class="hero-b"><div class="hero-bt">'+title+' <span class="hero-badge">'+periodLabel+'</span></div><div class="hero-bd">目標: <strong>100%</strong>　前週までの累計利用率（現在'+PD[ci].l+'進行中）</div></div></div><div class="hero-periods">'+periods+'</div>';
@@ -313,15 +292,7 @@ function bK(){
 }
 function kH(l,v,u){return '<div class="kpi"><div class="kpi-l">'+l+'</div><div class="kpi-v">'+v+'</div><div class="kpi-u">'+u+'</div></div>';}
 
-function swTab(id){
-  ['ov','mg','np','is','mt'].forEach(t=>{
-    const ni=document.getElementById('ni-'+t);
-    if(ni)ni.classList.toggle('on',t===id);
-  });
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
-  document.getElementById('p-'+id).classList.add('on');
-  ({ov:buildOv,mg:buildMg,np:buildNp,is:buildIs,mt:buildMt})[id]();
-}
+function swTab(id){['ov','mg','np','is','mt'].forEach(t=>{const e=document.getElementById('ni-'+t);if(e)e.classList.toggle('on',t===id);});document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));document.getElementById('p-'+id).classList.add('on');({ov:buildOv,mg:buildMg,np:buildNp,is:buildIs,mt:buildMt})[id]();}
 
 function buildOv(){
   const gd=GR.map(g=>{const ns=NPS.filter(s=>s.g===g),is=ISS.filter(s=>s.g===g),ip=IP.filter(s=>s.g===g);
@@ -337,9 +308,9 @@ function buildOv(){
   gd.forEach(d=>{const dc=d.df>0?'delta up':d.df<0?'delta dn':'delta';const ds=d.df>0?'▲'+d.df:d.df<0?'▼'+Math.abs(d.df):'→';
     h+='<tr><td style="font-weight:600">'+d.g+'</td><td style="text-align:right">'+d.n+'</td><td style="text-align:right;font-weight:700;color:#1a237e">'+d.pt+'</td><td style="text-align:right">'+d.sc+'</td><td style="text-align:right">'+d.ir+'%</td><td style="text-align:right;color:#888">'+d.irp+'%</td><td style="text-align:right"><span class="'+dc+'">'+ds+'</span></td></tr>';});
   h+='</tbody></table></div>';document.getElementById('p-ov').innerHTML=h;
-  dC('c1');ch.c1=new Chart(document.getElementById('c1'),{type:'bar',data:{labels:gd.map(d=>d.g.replace('G','')),datasets:[{data:gd.map(d=>d.pt),backgroundColor:'#1565c0',borderRadius:4,borderSkipped:false}]},options:bo({})});
-  dC('c2');ch.c2=new Chart(document.getElementById('c2'),{type:'bar',data:{labels:gd.map(d=>d.g.replace('G','')),datasets:[{data:gd.map(d=>d.sc),backgroundColor:'#0a8754',borderRadius:4,borderSkipped:false}]},options:bo({max:100})});
-  dC('c3');ch.c3=new Chart(document.getElementById('c3'),{type:'bar',data:{labels:gd.map(d=>d.g.replace('G','')),datasets:[{label:'当月',data:gd.map(d=>d.ir),backgroundColor:'#e91e8c',borderRadius:4,borderSkipped:false},{label:'前月',data:gd.map(d=>d.irp),backgroundColor:'rgba(233,30,140,.3)',borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{ticks:{callback:v=>v+'%'}}}}});
+  dC('c1');ch.c1=new Chart(document.getElementById('c1'),{type:'bar',data:{labels:gd.map(d=>d.g.replace('G','')),datasets:[{data:gd.map(d=>d.pt),backgroundColor:'#283593',borderRadius:4,borderSkipped:false}]},options:bo({})});
+  dC('c2');ch.c2=new Chart(document.getElementById('c2'),{type:'bar',data:{labels:gd.map(d=>d.g.replace('G','')),datasets:[{data:gd.map(d=>d.sc),backgroundColor:'#2e7d32',borderRadius:4,borderSkipped:false}]},options:bo({max:100})});
+  dC('c3');ch.c3=new Chart(document.getElementById('c3'),{type:'bar',data:{labels:gd.map(d=>d.g.replace('G','')),datasets:[{label:'当月',data:gd.map(d=>d.ir),backgroundColor:'#c62828',borderRadius:4,borderSkipped:false},{label:'前月',data:gd.map(d=>d.irp),backgroundColor:'#ef9a9a',borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{ticks:{callback:v=>v+'%'}}}}});
 }
 
 function buildMg(){
@@ -350,16 +321,16 @@ function buildMg(){
   const sr=[...ms].sort((a,b)=>b.arRate-a.arRate);
   let h='<div class="card"><div class="ct">管轄MG別 アクションレコメンド利用率</div><div style="position:relative;height:'+Math.max(220,sr.length*24)+'px"><canvas id="c4"></canvas></div></div>';
   h+='<div class="card"><div class="ct">管轄MG別サマリ</div><div style="max-height:500px;overflow-y:auto"><table class="tbl"><thead><tr><th>管轄MG</th><th>店舗数</th><th>利用率</th><th>現行版</th><th>旧版</th><th>W1</th><th>W2</th><th>W3</th><th>W4</th></tr></thead><tbody>';
-  sr.forEach(m=>{const c=m.arRate===100?'#0a8754':m.arRate>=80?'#1565c0':m.arRate>=50?'#e37400':'#e91e8c';const rt=m.rec.reduce((a,v)=>a+v,0),ot=m.old.reduce((a,v)=>a+v,0);h+='<tr><td style="font-weight:600">'+m.m+'MG</td><td style="text-align:right">'+m.t+'</td><td style="text-align:right;font-weight:700;color:'+c+'">'+m.rate+'%</td><td style="text-align:right"><span class="badge b-rec">'+rt+'</span></td><td style="text-align:right">'+(ot>0?'<span class="badge b-ng">'+ot+'</span>':'0')+'</td>';m.rec.forEach((v,i)=>{h+='<td style="text-align:center;font-size:11px">'+v+'/'+(v+m.old[i])+'</td>';});h+='</tr>';});
+  sr.forEach(m=>{const c=m.arRate>=80?'#2e7d32':m.arRate>=50?'#f57f17':'#c62828';const rt=m.rec.reduce((a,v)=>a+v,0),ot=m.old.reduce((a,v)=>a+v,0);h+='<tr><td style="font-weight:600">'+m.m+'MG</td><td style="text-align:right">'+m.t+'</td><td style="text-align:right;font-weight:700;color:'+c+'">'+m.rate+'%</td><td style="text-align:right"><span class="badge b-rec">'+rt+'</span></td><td style="text-align:right">'+(ot>0?'<span class="badge b-ng">'+ot+'</span>':'0')+'</td>';m.rec.forEach((v,i)=>{h+='<td style="text-align:center;font-size:11px">'+v+'/'+(v+m.old[i])+'</td>';});h+='</tr>';});
   h+='</tbody></table></div></div>';document.getElementById('p-mg').innerHTML=h;
-  dC('c4');const s2=[...ms].sort((a,b)=>a.arRate-b.arRate);ch.c4=new Chart(document.getElementById('c4'),{type:'bar',data:{labels:s2.map(m=>m.m+'MG'),datasets:[{data:s2.map(m=>m.arRate),backgroundColor:s2.map(m=>m.arRate===100?'#0a8754':m.arRate>=80?'#1565c0':m.arRate>=50?'#e37400':'#e91e8c'),borderRadius:4,borderSkipped:false}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>v+'%'},max:100},y:{grid:{display:false},ticks:{font:{size:11}}}}}});
+  dC('c4');const s2=[...ms].sort((a,b)=>a.arRate-b.arRate);ch.c4=new Chart(document.getElementById('c4'),{type:'bar',data:{labels:s2.map(m=>m.m+'MG'),datasets:[{data:s2.map(m=>m.arRate),backgroundColor:s2.map(m=>m.arRate>=80?'#2e7d32':m.arRate>=50?'#f57f17':'#c62828'),borderRadius:4,borderSkipped:false}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>v+'%'},max:100},y:{grid:{display:false},ticks:{font:{size:11}}}}}});
 }
 
 function buildNp(){
   const d=fNPS().slice().sort((a,b)=>(b.pt||0)-(a.pt||0));
   let h='<div class="card"><div class="ct">NPS得点ランキング（'+d.length+'店舗・'+ND+'日時点）</div><div style="max-height:500px;overflow-y:auto"><table class="tbl"><thead><tr>';
   ['#','グループ','店舗名','得点','スコア','回答率','高得点誘導','ログイン','FB','MTG','推進率'].forEach(c=>{h+='<th>'+c+'</th>';});h+='</tr></thead><tbody>';
-  d.forEach((s,i)=>{const pc=s.pt>=150?'#0a8754':s.pt>=50?'#e37400':'#e91e8c';h+='<tr><td style="text-align:center;color:#888">'+(i+1)+'</td><td style="font-size:11px">'+s.g+'</td><td>'+s.n+'</td><td style="font-weight:700;color:'+pc+';text-align:right">'+s.pt+'</td><td style="text-align:right">'+s.sc+'</td><td style="text-align:right">'+(s.rr?Math.round(s.rr*1000)/10+'%':'-')+'</td><td style="text-align:right;color:'+(s.hr>=.05?'#e91e8c':'#0a8754')+'">'+(s.hr!=null?Math.round(s.hr*1000)/10+'%':'-')+'</td><td style="text-align:center">'+(s.li>=1?'✓':Math.round((s.li||0)*100)+'%')+'</td><td style="text-align:center">'+(s.fb>=1?'✓':Math.round((s.fb||0)*100)+'%')+'</td><td style="text-align:center">'+(s.mt>=1?'✓':Math.round((s.mt||0)*100)+'%')+'</td></tr>';});
+  d.forEach((s,i)=>{const pc=s.pt>=150?'#2e7d32':s.pt>=50?'#f57f17':'#c62828';h+='<tr><td style="text-align:center;color:#888">'+(i+1)+'</td><td style="font-size:11px">'+s.g+'</td><td>'+s.n+'</td><td style="font-weight:700;color:'+pc+';text-align:right">'+s.pt+'</td><td style="text-align:right">'+s.sc+'</td><td style="text-align:right">'+(s.rr?Math.round(s.rr*1000)/10+'%':'-')+'</td><td style="text-align:right;color:'+(s.hr>=.05?'#c62828':'#2e7d32')+'">'+(s.hr!=null?Math.round(s.hr*1000)/10+'%':'-')+'</td><td style="text-align:center">'+(s.li>=1?'✓':Math.round((s.li||0)*100)+'%')+'</td><td style="text-align:center">'+(s.fb>=1?'✓':Math.round((s.fb||0)*100)+'%')+'</td><td style="text-align:center">'+(s.mt>=1?'✓':Math.round((s.mt||0)*100)+'%')+'</td></tr>';});
   h+='</tbody></table></div></div>';document.getElementById('p-np').innerHTML=h;
 }
 
@@ -375,20 +346,14 @@ function buildIs(){
     return{g:g.replace('G',''),ir,irp,df:Math.round((ir-irp)*10)/10};});
   h+='<div class="card"><div class="ct">グループ別 指摘改善率 良化・悪化</div><div style="position:relative;height:220px"><canvas id="c5"></canvas></div></div>';
   document.getElementById('p-is').innerHTML=h;
-  dC('c5');ch.c5=new Chart(document.getElementById('c5'),{type:'bar',data:{labels:gd.map(d=>d.g),datasets:[{label:'当月',data:gd.map(d=>d.ir),backgroundColor:'#1565c0',borderRadius:4,borderSkipped:false},{label:'前月',data:gd.map(d=>d.irp),backgroundColor:'rgba(30,144,233,.3)',borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{ticks:{callback:v=>v+'%'}}}}});
+  dC('c5');ch.c5=new Chart(document.getElementById('c5'),{type:'bar',data:{labels:gd.map(d=>d.g),datasets:[{label:'当月',data:gd.map(d=>d.ir),backgroundColor:'#283593',borderRadius:4,borderSkipped:false},{label:'前月',data:gd.map(d=>d.irp),backgroundColor:'#9fa8da',borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{ticks:{callback:v=>v+'%'}}}}});
 }
 
 function buildMt(){
-  const sts_raw=fSTM();
-  const sts=[...sts_raw].sort((a,b)=>{
-    const ra=a.wk.length>0?a.wk.filter(w=>w.tp==='現行版').length/a.wk.length:0;
-    const rb=b.wk.length>0?b.wk.filter(w=>w.tp==='現行版').length/b.wk.length:0;
-    return rb-ra;
-  });
+  const sts_r=fSTM();const sts=[...sts_r].sort((a,b)=>{const ra=a.wk.length?a.wk.filter(w=>w.tp==='現行版').length/a.wk.length:0;const rb=b.wk.length?b.wk.filter(w=>w.tp==='現行版').length/b.wk.length:0;return rb-ra;});
   let h='<div class="card"><div class="ct">店舗別 MTG実施状況（実施者・版）</div><div style="max-height:600px;overflow-y:auto"><table class="tbl"><thead><tr><th>グループ</th><th>管轄MG</th><th>店舗名</th><th>現行版</th><th>旧版</th>';
-  h+='<th>利用率</th>';h+='<th>推進率</th>';for(let w=1;w<=5;w++)h+='<th>'+w+'回目</th>';h+='</tr></thead><tbody>';
-  sts.forEach(s=>{const arc=s._arRate>=80?'#0a8754':s._arRate>=50?'#e37400':'#e91e8c';
-    h+='<tr><td style="font-size:11px">'+s.g+'</td><td style="font-size:11px">'+s.mg+'MG</td><td>'+s.n+'</td><td style="font-size:11px">'+s.rec+'</td><td style="font-size:11px">'+s.old+'</td><td style="text-align:center;font-weight:700;font-family:DM Mono,monospace;color:'+arc+'">'+( s._arRate>=0?s._arRate+'%':'—' )+'</td>';
+  h+='<th>推進率</th>';for(let w=1;w<=5;w++)h+='<th>'+w+'回目</th>';h+='</tr></thead><tbody>';
+  sts.forEach(s=>{const mr=s.wk.filter(w=>w.tp==='現行版').length;const mo=s.wk.filter(w=>w.tp!=='現行版').length;const mrt=mr+mo>0?Math.round(mr/(mr+mo)*100):null;const mrc=mrt===100?'#0a8754':mrt>=80?'#1565c0':mrt>=50?'#e37400':'#e91e8c';h+='<tr><td style="font-size:11px">'+s.g+'</td><td style="font-size:11px">'+s.mg+'MG</td><td>'+s.n+'</td><td style="font-size:11px">'+s.rec+'</td><td style="font-size:11px">'+s.old+'</td><td style="text-align:center;font-weight:700;color:'+mrc+'">'+(mrt===null?'-':mrt+'%')+'</td>';
     for(let w=1;w<=5;w++){const wk=s.wk.find(x=>x.w===w);if(wk){const ir=wk.tp==='現行版';h+='<td style="font-size:10px"><span class="badge '+(ir?'b-rec':'b-ng')+'">'+wk.tp+'</span><br><strong>'+wk.who+'</strong><br><span style="color:#999">'+wk.d+'</span></td>';}else h+='<td style="text-align:center;color:#ddd">—</td>';}h+='</tr>';});
   h+='</tbody></table></div></div>';document.getElementById('p-mt').innerHTML=h;
 }
@@ -397,22 +362,22 @@ function bD(){
   const nps=NPS.find(s=>s.n===fS);const iss=ISS.find(s=>s.n===fS);const mtg=STM.find(s=>s.n===fS);const isp=IP.find(s=>s.n===fS);
   if(!nps&&!iss&&!mtg){document.getElementById('detail').innerHTML='<div class="card"><p style="color:#888">「'+fS+'」のデータが見つかりません</p></div>';return;}
   let h='';
-  if(mtg){h+='<div class="card"><div class="ct">MTG実施状況 ─ '+fS+'（'+mtg.mg+'MG管轄）</div><div style="display:flex;gap:16px;margin-bottom:14px"><span>現行版: <strong style="color:#1e90e9">'+mtg.rec+'</strong></span><span>旧版: <strong style="color:#c62828">'+mtg.old+'</strong></span></div><div class="mtg-wk">';
+  if(mtg){h+='<div class="card"><div class="ct">MTG実施状況 ─ '+fS+'（'+mtg.mg+'MG管轄）</div><div style="display:flex;gap:16px;margin-bottom:14px"><span>現行版: <strong style="color:#1565c0">'+mtg.rec+'</strong></span><span>旧版: <strong style="color:#c62828">'+mtg.old+'</strong></span></div><div class="mtg-wk">';
     for(let w=1;w<=5;w++){const wk=mtg.wk.find(x=>x.w===w);if(wk){const ir=wk.tp==='現行版';h+='<div class="mtg-card '+(ir?'rec':'old')+'"><div class="mtg-wn">'+w+'回目（'+wk.d+'）</div><div class="mtg-who">'+wk.who+'</div><div class="mtg-tp"><span class="badge '+(ir?'b-rec':'b-ng')+'">'+wk.tp+'</span></div></div>';}else h+='<div class="mtg-card none"><div class="mtg-wn">'+w+'回目</div><div class="mtg-who" style="color:#ccc">未実施</div></div>';}h+='</div></div>';}
   if(nps){
     const rr=Math.round(nps.rr*1000)/10,hr=nps.hr!=null?Math.round(nps.hr*1000)/10:0;
     let lri=LS.findIndex(s=>nps.sc>=s);if(lri===-1)lri=LS.length-1;let lci=LR.findIndex(r=>nps.rr>=r);if(lci===-1)lci=LR.length-1;
     const bp=LP[lri]?.[lci]??0;const hm=nps.hr<.05?1:nps.hr<.06?.8:nps.hr<.07?.7:nps.hr<.08?.6:nps.hr<.09?.5:nps.hr<.10?.4:.3;const fp=Math.round(bp*hm);
-    h+='<div class="card"><div class="ct">NPS成果評価 ─ '+fS+'（'+ND+'日時点）</div><div class="dg3"><div class="dc" style="background:rgba(30,144,233,.08);border-color:rgba(30,144,233,.2)"><div class="dl">NPS得点</div><div class="dv" style="color:#1e90e9">'+nps.pt+'</div></div><div class="dc" style="background:rgba(0,200,117,.08);border-color:rgba(0,200,117,.2)"><div class="dl">スコア</div><div class="dv" style="color:#00c875">'+nps.sc+'</div></div><div class="dc" style="background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.2)"><div class="dl">回答率</div><div class="dv" style="color:#f59e0b">'+rr+'%</div></div></div>';
+    h+='<div class="card"><div class="ct">NPS成果評価 ─ '+fS+'（'+ND+'日時点）</div><div class="dg3"><div class="dc" style="background:#e3f2fd"><div class="dl">NPS得点</div><div class="dv" style="color:#1565c0">'+nps.pt+'</div></div><div class="dc" style="background:#e8f5e9"><div class="dl">スコア</div><div class="dv" style="color:#2e7d32">'+nps.sc+'</div></div><div class="dc" style="background:#fff3e0"><div class="dl">回答率</div><div class="dv" style="color:#e65100">'+rr+'%</div></div></div>';
     h+='<div class="sg4">';[['店長ログイン率',nps.li>=1?'100%':Math.round((nps.li||0)*100)+'%',nps.li>=.8?'ok':'w'],['FBコール率',nps.fb>=1?'100%':Math.round((nps.fb||0)*100)+'%',nps.fb>=.8?'ok':'w'],['MTG実施率',nps.mt>=1?'100%':Math.round((nps.mt||0)*100)+'%',nps.mt>=1?'ok':'ng'],['高得点誘導率',hr+'%',nps.hr<.05?'ok':nps.hr<.08?'w':'ng']].forEach(([l,v,t])=>{h+='<div class="sbox"><div class="sl">'+l+'</div><div class="sv">'+v+'</div><div style="margin-top:4px"><span class="badge b-'+t+'">'+(t==='ok'?'達成':t==='w'?'注意':'未達')+'</span></div></div>';});h+='</div>';
     h+='<div style="font-size:13px;font-weight:700;color:#1a237e;margin-bottom:8px">クロスラダー</div><div class="ldr"><table><thead><tr><th>スコア＼回答率</th>';LR.forEach((r,ci)=>{h+='<th'+(ci===lci?' class="hl"':'')+'>'+Math.round(r*1000)/10+'%</th>';});h+='</tr></thead><tbody>';LS.forEach((sc,ri)=>{h+='<tr><td'+(ri===lri?' class="hl"':'')+'>'+sc+'</td>';LP[ri].forEach((pt,ci)=>{h+='<td'+(ri===lri&&ci===lci?' class="hl"':'')+'>'+pt+'</td>';});h+='</tr>';});h+='</tbody></table></div>';
     h+='<div class="lr"><strong>自動計算:</strong> スコア'+nps.sc+' → '+LS[lri]+'以上 / 回答率'+rr+'% → '+Math.round(LR[lci]*100)+'%以上 → 基礎点<strong>'+bp+'pt</strong>';
-    if(nps.hr>=.05)h+=' <span style="color:#c62828">× 高得点誘導'+hr+'% → ×'+hm+' → <strong>'+fp+'pt</strong></span>';else h+=' <span style="color:#00c875">（減算なし）→ <strong>'+fp+'pt</strong></span>';h+='</div></div>';}
+    if(nps.hr>=.05)h+=' <span style="color:#c62828">× 高得点誘導'+hr+'% → ×'+hm+' → <strong>'+fp+'pt</strong></span>';else h+=' <span style="color:#2e7d32">（減算なし）→ <strong>'+fp+'pt</strong></span>';h+='</div></div>';}
   if(iss){const ir=iss.resp>0?Math.round(iss.iss/iss.resp*1000)/10:0;const mx=Math.max(...iss.c,1);const irp=isp&&isp.resp>0?Math.round(isp.iss/isp.resp*1000)/10:null;const df=irp!=null?Math.round((ir-irp)*10)/10:null;const dh=df!=null?(df>0?'<span class="delta up">▲'+df+'</span>':df<0?'<span class="delta dn">▼'+Math.abs(df)+'</span>':'<span class="delta">→</span>'):'';
     h+='<div class="card"><div class="ct">指摘改善サマリ ─ '+fS+'（当月）</div><div style="display:flex;gap:20px;margin-bottom:14px"><div><span style="font-size:11px;color:#666">総回答数</span><div style="font-size:22px;font-weight:700;color:#1a237e">'+iss.resp+'</div></div><div><span style="font-size:11px;color:#666">指摘件数</span><div style="font-size:22px;font-weight:700;color:#c62828">'+iss.iss+'</div></div><div><span style="font-size:11px;color:#666">指摘改善率</span><div style="font-size:22px;font-weight:700">'+ir+'% '+dh+'</div></div>';
     if(isp)h+='<div><span style="font-size:11px;color:#666">前月</span><div style="font-size:22px;font-weight:700;color:#888">'+irp+'%</div></div>';h+='</div>';
     CF.forEach((c,i)=>{const v=iss.c[i]||0;const pv=isp?isp.c[i]||0:0;const d=v-pv;const dd=d>0?'<span class="delta up">+'+d+'</span>':d<0?'<span class="delta dn">'+d+'</span>':'';h+='<div class="br"><span class="br-l">'+c+'</span><div class="br-bg"><div class="br-f" style="width:'+Math.round(v/mx*100)+'%;background:'+CL[i]+'"></div></div><span class="br-n">'+v+' '+dd+'</span></div>';});
-    const ti=iss.c.indexOf(Math.max(...iss.c));if(iss.c[ti]>0)h+='<div style="margin-top:12px;padding:12px;background:rgba(245,158,11,.08);border-radius:8px;font-size:12px;border:1px solid rgba(245,158,11,.2)"><strong>最重要改善項目:</strong> '+CF[ti]+'（'+iss.c[ti]+'件）</div>';h+='</div>';}
+    const ti=iss.c.indexOf(Math.max(...iss.c));if(iss.c[ti]>0)h+='<div style="margin-top:12px;padding:12px;background:#fff3e0;border-radius:8px;font-size:12px;border:1px solid #ffe0b2"><strong>最重要改善項目:</strong> '+CF[ti]+'（'+iss.c[ti]+'件）</div>';h+='</div>';}
   document.getElementById('detail').innerHTML=h;
 }
 
